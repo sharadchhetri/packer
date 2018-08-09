@@ -1,0 +1,38 @@
+{
+	"builders": [{
+		"type": "amazon-ebs",
+		"access_key": "{{user `aws_access_key`}}",
+		"secret_key": "{{user `aws_secret_key`}}",
+		"region": "{{user `aws_region`}}",
+		"source_ami_filter": {
+			"filters": {
+				"virtualization-type": "hvm",
+				"name": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
+				"root-device-type": "ebs"
+			},
+			"most_recent": true
+		},
+		"instance_type": "t2.micro",
+		"ssh_username": "ubuntu",
+		"ami_name": "{{user `app_server01_name`}}-{{timestamp}}",
+		"tags": {
+			"Name": "{{user `app_server01_name`}}-{{timestamp}}",
+			"OS_Version": "Ubuntu",
+			"Release": "Latest",
+			"Base_AMI_Name": "{{ .SourceAMIName }}",
+			"Base AMI Id": "{{ .SourceAMI }}"
+		  }
+
+	}],
+	"provisioners": [{
+		"type": "shell",
+		"inline": [
+			"sudo apt -y install wget screen apache2"
+		]
+	}],
+	"post-processors": [{
+		"type": "manifest",
+		"output": "{{user `app_server01_name`}}-manifest.json",
+		"strip_path": true
+	}]
+}
